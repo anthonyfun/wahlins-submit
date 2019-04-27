@@ -1,0 +1,7 @@
+() Automatiskt fyll i nyupplagda lägenheter på wåhlins fastigheter's webb
+() Lägg till databaskoppling
+() Spara lägenheter du ansökt i en db
+() Lägg till kommandon för att hämta poster från db:n 
+() Använd processvariabler som är satta i Heroku
+() Dubbelkolla uptime så att appen faktiskt alltid kör
+() Få till bygge via Heroku
