@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 
-const auth = require('./auth.json');
 const { Status, Disc } = require('./global.js');
 
 class DiscordClient {
@@ -32,7 +31,7 @@ class DiscordClient {
         });
         
         this.client.on('message', messageCallback);
-        this.client.login(auth.token);
+        this.client.login(process.env.DISCORD_BOT_TOKEN);
     }
 
     // send message to Discord channel
@@ -43,6 +42,7 @@ class DiscordClient {
             return;
         }
 
+        console.log(`sending message to discord: ${message}`);
         channel.send(message);
     }
 

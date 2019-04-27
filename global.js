@@ -1,6 +1,6 @@
 module.exports = {
     Config: {
-        URL: 'https://dizz.se',
+        URL: 'https://wahlinfastigheter.se/lediga-objekt/lagenhet/',
         INTERVAL_IN_MS: 120000 // every other minute
     },
     
@@ -21,6 +21,10 @@ module.exports = {
     
     Command: {
         STATUS: 'status'
+    },
+
+    Wahlins: {
+        NO_NEW_APARTMENTS: 'Just nu har vi tyvärr inga lediga lägenheter att förmedla här.'
     },
     
     isCommand: (str, command) => {

@@ -3,9 +3,9 @@ const Robot = require('./robot.js');
 
 const { Command, isCommand } = require('./global.js');
 
-new Robot().run();
+const discord = new Discord();
 
-//const discord = new Discord();
+new Robot().run(discord);
 
 // discord.init(
 //     (message) => {
