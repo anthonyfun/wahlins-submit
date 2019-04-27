@@ -20,7 +20,8 @@ module.exports = {
     },
     
     Command: {
-        STATUS: 'status'
+        STATUS: 'status',
+        REQUEST_COUNT: 'request-count'
     },
 
     Wahlins: {

@@ -11,7 +11,7 @@ class Robot {
         if (await this.hasNewApartments(page)) {
             console.log("Found new apartments");
             discord.sendMessage("Found new apartments");
-        } 
+        }
         
         await browser.close();
     }
