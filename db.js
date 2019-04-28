@@ -20,6 +20,7 @@ class DB {
             console.log(result.data);
         } catch (error) {
             console.log(`Error when adding apartment to db: ${error}`);
+            throw error;
         }
     }
 
@@ -36,6 +37,7 @@ class DB {
             return instances.map(instance => instance.data);
         } catch (error) {
             console.log(`Error when retrieving all apartments: ${error}`);
+            throw error;
         }
     }
 }
