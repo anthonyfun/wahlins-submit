@@ -2,6 +2,6 @@
 () Lägg till databaskoppling
 () Spara lägenheter du ansökt i en db
 () Lägg till kommandon för att hämta poster från db:n 
-() Använd processvariabler som är satta i Heroku
+() Få till processvariabler
 () Dubbelkolla uptime så att appen faktiskt alltid kör
-() Få till bygge via Heroku
+() Leta plattform för host (alternativt på din raspberry pi)
