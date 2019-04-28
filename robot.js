@@ -9,8 +9,8 @@ class Robot {
         console.log(page.url());
 
         if (await this.hasNewApartments(page)) {
-            console.log("Found new apartments");
-            discord.sendMessage("Found new apartments");
+            console.log('Found new apartments');
+            discord.sendMessage('Found new apartments');
         }
         
         await browser.close();
@@ -18,7 +18,7 @@ class Robot {
 
     async hasNewApartments(page) {
         const texts = await page.evaluate(() => {
-            let innerTexts = [];
+            const innerTexts = [];
             const elements = document.getElementsByTagName('h3');
             if (elements) {
                 for (let element of elements) {

@@ -19,6 +19,7 @@
   "homepage": "https://github.com/jesperc/wahlins-submit#readme",
   "dependencies": {
     "discord.js": "^11.2.1",
+    "faunadb": "^2.6.1",
     "puppeteer": "^1.15.0"
   },
   "engines": {

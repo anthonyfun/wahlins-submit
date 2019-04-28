@@ -11,7 +11,7 @@ class DiscordClient {
     init(messageCallback, onDone) {
         this.client.on('ready', () => {
             this.status = Status.RUNNING;
-            let message = 'Client connected';
+            const message = 'Client connected';
             console.log(message);
             this.sendMessage(message);
             onDone();
@@ -19,24 +19,24 @@ class DiscordClient {
         
         this.client.on('error', (error) => {
             this.status = Status.ERROR;
-            let errorMessage = `Client error ${error}`;
+            const errorMessage = `Client error ${error}`;
             console.log(errorMessage);
             this.sendMessage(errorMessage);
         });
         
         this.client.on('disconnect', () => {
-            let message = 'Client disconnected';
+            const message = 'Client disconnected';
             console.log(message);
             this.sendMessage(message);
         });
         
         this.client.on('message', messageCallback);
-        this.client.login(process.env.DISCORD_BOT_TOKEN);
+        this.client.login('');
     }
 
     // send message to Discord channel
     sendMessage(message) {
-        let channel = this.client.channels.find(c => c.id === Disc.CHANNEL_ID);
+        const channel = this.client.channels.find(c => c.id === Disc.CHANNEL_ID);
         if (! channel) {
             console.log(`Couldn't find channel with id ${Disc.CHANNEL_ID}`);
             return;

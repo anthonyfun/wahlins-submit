@@ -18,17 +18,8 @@ module.exports = {
         RUNNING: 'Running',
         ERROR: 'Error'
     },
-    
-    Command: {
-        STATUS: 'status',
-        REQUEST_COUNT: 'request-count'
-    },
 
     Wahlins: {
         NO_NEW_APARTMENTS: 'Just nu har vi tyvärr inga lediga lägenheter att förmedla här.'
     },
-    
-    isCommand: (str, command) => {
-        return str === `!${command}`;
-    }
 };
