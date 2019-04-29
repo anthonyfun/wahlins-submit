@@ -1,7 +1,7 @@
 module.exports = {
     Config: {
         URL: 'https://wahlinfastigheter.se/lediga-objekt/lagenhet/',
-        INTERVAL_IN_MS: 120000 // every other minute
+        INTERVAL_IN_MS: 300000 // every five minutes
     },
     
     // Naming this Disc instead of Discord to avoid name collisions with discord.js
