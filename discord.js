@@ -1,3 +1,4 @@
+require('dotenv').config();
 const Discord = require('discord.js');
 
 const { Status, Disc } = require('./global.js');
@@ -31,7 +32,7 @@ class DiscordClient {
         });
         
         this.client.on('message', messageCallback);
-        this.client.login('');
+        this.client.login(process.env.DISCORD_BOT_TOKEN);
     }
 
     // send message to Discord channel

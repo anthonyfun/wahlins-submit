@@ -1,10 +1,11 @@
+require('dotenv').config();
 const faunadb = require('faunadb');
 const q = faunadb.query;
 
 class DB {
     constructor() {
         this.client = new faunadb.Client(
-            { secret: '' }
+            { secret: process.env.FAUNADB_SECRET }
         );
     }
 
