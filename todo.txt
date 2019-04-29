@@ -2,7 +2,7 @@
 (X) Lägg till databaskoppling
 () Spara lägenheter du ansökt i en db
 () Lägg till kommandon för att hämta poster från db:n 
-() Få till processvariabler
+(X) Få till processvariabler
 (X) Leta plattform för host (alternativt på din raspberry pi)
-() lägg till run setting för "test without discord"
-() få till puppeteer i raspberry pi
+(X) få till puppeteer i raspberry pi
+() få till automatisk release vid push till master på din pi
