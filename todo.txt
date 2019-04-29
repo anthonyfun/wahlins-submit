@@ -3,4 +3,6 @@
 () Spara lägenheter du ansökt i en db
 () Lägg till kommandon för att hämta poster från db:n 
 () Få till processvariabler
-() Leta plattform för host (alternativt på din raspberry pi)
+(X) Leta plattform för host (alternativt på din raspberry pi)
+() lägg till run setting för "test without discord"
+() få till puppeteer i raspberry pi

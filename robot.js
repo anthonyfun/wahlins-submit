@@ -3,7 +3,7 @@ const { Config, Wahlins } = require('./global.js');
 
 class Robot {
     async run(discord) {
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({executablePath: 'chromium-browser'});
         const page = await browser.newPage();
         await page.goto(Config.URL);
         console.log(page.url());
