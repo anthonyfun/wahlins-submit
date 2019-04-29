@@ -1,19 +1,25 @@
 const puppeteer = require('puppeteer');
-const { Config, Wahlins } = require('./global.js');
+const { Config, Status, Wahlins } = require('./global.js');
 
 class Robot {
-    async run(discord) {
-        const browser = await puppeteer.launch({executablePath: 'chromium-browser'});
-        const page = await browser.newPage();
-        await page.goto(Config.URL);
-        console.log(page.url());
+    async run(discord, interval) {
+        try {
+            const browser = await puppeteer.launch({executablePath: 'chromium-browser'});
+            const page = await browser.newPage();
+            await page.goto(Config.URL);
+            console.log(page.url());
 
-        if (await this.hasNewApartments(page)) {
-            console.log('Found new apartments');
-            discord.sendMessage('Found new apartments');
-        }
+            if (await this.hasNewApartments(page)) {
+                console.log('Found new apartments');
+                discord.sendMessage('Found new apartments');
+            }
         
-        await browser.close();
+            await browser.close();
+        } catch (error) {
+            discord.sendMessage(`Error: ${error}`);
+            discord.setStatus(Status.ERROR);
+            clearInterval(interval);
+        }
     }
 
     async hasNewApartments(page) {

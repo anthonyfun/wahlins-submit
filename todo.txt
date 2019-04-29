@@ -6,3 +6,4 @@
 (X) Leta plattform för host (alternativt på din raspberry pi)
 (X) få till puppeteer i raspberry pi
 () få till automatisk release vid push till master på din pi
+(X) stoppa körning vid error

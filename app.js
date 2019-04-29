@@ -9,7 +9,7 @@ let requestCount = 0;
 
 discord.init(
     (message) => {
-        console.log(`Recieved message: ${message.content}`);
+        console.log(`Receieved message: ${message.content}`);
 
         if (message.content === '!status') {
             (async () => {
@@ -47,8 +47,8 @@ ${apartments.map(apartment => apartment.address).sort().join('\n')}
     },
     () => {
         // main loop
-        setInterval(() => {
-            new Robot().run(discord);
+        const interval = setInterval(() => {
+            new Robot().run(discord, interval);
             ++requestCount;
         }, Config.INTERVAL_IN_MS);
     }
