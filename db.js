@@ -9,8 +9,23 @@ class DB {
         );
     }
 
-    async add(apartment) {
-        apartment.created = new Date().toUTCString();
+    async addApartment(object) {
+        const apartment = {
+            applicant: process.env.SOCIAL_SECURITY_NUMBER,
+            href: object.href,
+            objectNumber: object.objectNumber,
+            address: object.address,
+            rooms: object.rooms,
+            area: object.area,
+            rent: object.rent,
+            moveIn: object.moveIn,
+            type: object.type,
+            salaryRequirement: object.salaryRequirement,
+            importantNotice: object.importantNotice,
+            lottery: object.lottery,
+            created: new Date().toUTCString()
+        };
+
         try {
             // add apartment to db
             const result = await this.client.query(
@@ -25,7 +40,7 @@ class DB {
         }
     }
 
-    async getAll() {
+    async getAllApartments() {
         try {
             // get all references from index
             const refs = await this.client.query(
