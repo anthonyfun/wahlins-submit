@@ -18,23 +18,18 @@ class DiscordClient {
     init(onMessage, onReady) {
         this.client.on('ready', () => {
             this.status = Status.RUNNING;
-            const message = 'Client connected';
-            console.log(message);
-            this.sendMessage(message);
+            this.sendMessage('Client connected');
             onReady();
         });
         
         this.client.on('error', (error) => {
             this.status = Status.ERROR;
-            const errorMessage = `Client error ${error}`;
-            console.log(errorMessage);
-            this.sendMessage(errorMessage);
+            this.sendMessage(`Client error ${error}`);
         });
         
         this.client.on('disconnect', () => {
-            const message = 'Client disconnected';
-            console.log(message);
-            this.sendMessage(message);
+            this.status = Status.NOT_CONNECTED;
+            this.sendMessage('Client disconnected');
         });
         
         this.client.on('message', onMessage);
@@ -53,7 +48,6 @@ class DiscordClient {
             return;
         }
 
-        console.log(`sending message to discord: ${message}`);
         channel.send(message);
     }
 

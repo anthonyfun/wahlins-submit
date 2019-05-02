@@ -1,22 +1,11 @@
 const puppeteer = require('puppeteer');
+const isPi = require('detect-rpi');
+
 const { sendMessage } = require('./util.js');
 const db = require('./db.js');
 
 //const URL = 'https://wahlinfastigheter.se/lediga-objekt/lagenhet/';
 const URL = 'https://dizz.se/wahlins';
-
-const INFO_LABELS = [
-    'Objektsnummer',
-    'Om',
-    'Rum',
-    'Area',
-    'Hyra',
-    'Inflytt',
-    'Typ',
-    'Inkomstkrav',
-    'Viktigt om visning',
-    'Lottning',
-];
 
 const INPUT_IDS = [
     'Förnamn',
@@ -51,11 +40,7 @@ const CONTACT_LABEL = 'Kontaktperson';
 const SELECT_TOTAL_RESIDENTS_ID = 'Hushållet_personer';
 const TEXTAREA_OTHER_NAME = 'message';
 const CHECKBOX_GDPR_ID = 'gdpr_checkbox';
-const SUBMIT_BUTTON_NAME = 'Submit';
 const OTHER_FIELD_SPECIAL_CASE = 'Jag förstår att visningen är idag!';
-const APARTMENT_LIST_CLASS = 'fastighet';
-const CONFIRM_P_CLASS = 'submit-green';
-const CONFIRM_TEXT = 'Tack!';
 const NO_NEW_APARTMENTS = 'Just nu har vi tyvärr inga lediga lägenheter att förmedla här.';
 
 class Robot {
@@ -65,27 +50,30 @@ class Robot {
 
     async run() {
         try {
-            console.log("running");
-            // 'chromium-browser' is needed for Raspian on raspberry pi. You can probably
-            // omit the launch options if using a different platform. 
-            //const browser = await puppeteer.launch({executablePath: 'chromium-browser'});
-            const browser = await puppeteer.launch({ 
-                headless: !(process.argv.length > 2 && process.argv[2] === 'gui'),
-                slowMo: process.argv.length > 3 ? Number(process.argv[3]) : 0
-            });
-            console.log("launched");
+            console.log('running');
+
+            // 'chromium-browser' is needed for Raspian on raspberry pi, 
+            // couldn't make it work otherwise.
+            const options = isPi() 
+                ? { executablePath: 'chromium-browser' }
+                : {
+                    headless: !(process.argv.length > 2 && process.argv[2] === 'gui'),
+                    slowMo: process.argv.length > 3 ? Number(process.argv[3]) : 0
+                };
+
+            console.log('launching puppeteer');
+            const browser = await puppeteer.launch(options);
+
+            console.log('opening new page');
             const page = await browser.newPage();
-            console.log("opened new page");
 
+            console.log(`switching url to ${URL}`);
             await page.goto(URL);
-            console.log(page.url());
 
-            if (await this.hasNewApartments(page)) {
-                sendMessage('Found new apartments');
-
-                await this.applyForApartments(page);
-            }
+            console.log('will now look for new apartments');
+            await this.applyForApartments(page);
         
+            console.log('closing browser');
             await browser.close();
         } catch (error) {
             sendMessage(`Error: ${error}`);
@@ -96,73 +84,63 @@ class Robot {
     }
 
     async applyForApartments(page) {
-        const appliedApartments = await db.getAllApartments();
-
-        page.on('console', (message) => {
-            console.log(message._text);
-        });
-
-        console.log("evaluating");
-        const hrefs = await page.evaluate((className) => {
+        console.log('will now try fetch hrefs for new apartments');
+        const hrefs = await page.evaluate(() => {
             let hrefs = [];
-            let elements = document.querySelectorAll(`.${className}`);
+            let elements = document.querySelectorAll('.readmore');
             for (let element of elements) {
-                if (element.children.length > 0 
-                    && !element.children[0].href.includes('?page')
-                ) {
+                if (element.children.length > 0  && !element.children[0].href.includes('?page')) {
                     hrefs.push(element.children[0].href);
-                    console.log(element.children[0].href);
-                } else {
-                    console.log("invalid href");
-                }
+                } 
             }
 
             return hrefs;
-        }, 'readmore');
-        console.log("done");
-        console.log(hrefs);
+        });
+
+        const existingObjectNumbers = await db
+            .getAllApartments()
+            .map((item) => item.objectNumber);
 
         for (let href of hrefs) {
+            console.log(`switching url to ${href}`);
             await page.goto(href);
-            console.log(page.url());
 
+            console.log('fetching information');
             const information = await this.getInformation(page);
-            console.log(information);
 
-            if (appliedApartments.map((item) => item.objectNumber).indexOf(information['Objektsnummer']) < 0) {
-                if (await this.applyForApartment(page)) {
-                    sendMessage("Applied for apartment!");
-                    // save information to db
-                    try {
-                        console.log("will add apartment to db");
-                        //await db.add(information);
-                    } catch (error) {
-                        const message = `Couldn't save the applied apartment to the DB: ${error}`;
-                        sendMessage(message);
-                        console.log(message);
-                        sendMessage(JSON.stringify(information));
-                        console.log(JSON.stringify(information));
-                    }
-                } else {
-                    sendMessage("Couldn't apply for application, quitting");
-                    sendMessage(JSON.stringify(information));
-                    console.log(JSON.stringify(informatin));
-                    console.log("Couldn't apply for application, quitting");
-                    throw 'Error: Couldn\'t send application';
-                }
-            } else {
+            if (existingObjectNumbers.indexOf(information['Objektsnummer']) >= 0) {
                 console.log(`already applied to ${information['Objektsnummer']}`);
+                continue;
             }
 
-            await page.waitFor(20000);
-        }
-    }
+            if (await this.applyForApartment(page)) {
+                sendMessage(`applied for apartment! 
+                    ${[information['Om'], information['Area'], information['Hyra']].join(', ')}`
+                );
 
-    async applyForApartment(page) {
-        await this.fillForm(page);
-        //await this.submitForm(page);
-        //return await this.confirmApplication(page);
-        return true;
+                try {
+                    console.log('saving apartment to db');
+                    await db.addApartment({
+                        href,
+                        objectNumber: information['Objektsnummer'],
+                        address: information['Om'],
+                        rooms: information['Rum'],
+                        area: information['Area'],
+                        rent: information['Hyra'],
+                        moveIn: information['Inflytt'],
+                        type: information['Typ'],
+                        salaryRequirement: information['Inkomstkrav'],
+                        lottery: information['Lottning'],
+                        importantNotice: information['Viktigt om visning']
+                    });
+                } catch (error) {
+                    sendMessage(`Couldn't save apartment to db: ${error}`);
+                }
+            } else {
+                sendMessage(`Couldn't apply for apartment ${information}`);
+                throw 'Error, couldn\'t apply for apartment';
+            }
+        }
     }
 
     async getInformation(page) {
@@ -191,6 +169,13 @@ class Robot {
 
             return information;
         });
+    }
+
+    async applyForApartment(page) {
+        await this.fillForm(page);
+        await this.submitForm(page);
+        await page.waitFor(10000);
+        return await this.confirmApplication(page);
     }
 
     async getContact(page) {
@@ -232,39 +217,25 @@ class Robot {
     }
 
     async submitForm(page) {
-        await page.click(SUBMIT_BUTTON_NAME);
-    }
-
-    async confirmApplication() {
         return await page.evaluate(() => {
-            const elements = document.querySelector(`.${CONFIRM_P_CLASS}`)
-            for (let element of elements) {
-                if (element.innerTextl.contains(CONFIRM_TEXT)) {
-                    return true;
-                }
+            let input = document.querySelector('input[name="Submit"]');
+            if (input) {
+                input.click();
+                return true;
             }
             return false;
         });
     }
 
-    async hasNewApartments(page) {
-        const texts = await page.evaluate(() => {
-            const innerTexts = [];
-            const elements = document.getElementsByTagName('h3');
-            if (elements) {
-                for (let element of elements) {
-                    innerTexts.push(element.innerText);
-                }
-            }
-            return innerTexts;
+    async confirmApplication(page) {
+        await page.waitForSelector('.submit-green');
+        console.log(page.url());
+        let temp = await page.evaluate(() => {
+            const element = document.querySelector('.submit-green');
+            return element && element.innerText.includes('Tack!');
         });
-
-        for (let text of texts) {
-            if (text === NO_NEW_APARTMENTS) {
-                return false;
-            }
-        }
-        return true;
+        page.waitFor(10000);
+        return temp;
     }
 
     getRequestCount() {

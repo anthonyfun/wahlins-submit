@@ -1,14 +1,14 @@
 ( ) Automatiskt fyll i nyupplagda lägenheter på wåhlins fastigheter's webb
 (X) Lägg till databaskoppling
-( ) Spara lägenheter du ansökt i en db
+(X) Spara lägenheter du ansökt i en db
 (X) Lägg till kommando för att hämta poster från db:n 
 (X) Få till processvariabler
 (X) Leta plattform för host (alternativt på din raspberry pi)
 (X) få till puppeteer i raspberry pi
+(X) kan fylla i formulär
 ( ) få till automatisk release vid push till master på din pi
 ( ) få till automatisk omstart av app vid error/restart på din pi
 ( ) setInterval(async () => ...) - få till så att den inte kör igen om den inte är klar
-( ) i sendMessage, kör också console.log();
 ( ) kör puppeteer-core så man inte drar ner chromium
-( ) kod cleanup
 ( ) få till så när du hämtar ansökningar så matchar du på 'applicant'
+( ) kod cleanup

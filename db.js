@@ -25,7 +25,7 @@ class DB {
             lottery: object.lottery,
             created: new Date().toUTCString()
         };
-
+        
         try {
             // add apartment to db
             const result = await this.client.query(
