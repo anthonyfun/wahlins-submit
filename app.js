@@ -3,7 +3,7 @@ const robot = require('./robot.js');
 const db = require('./db.js');
 const { sendMessage } = require('./util.js');
 
-const INTERVAL_IN_MS = 300000;
+const INTERVAL_IN_MS = 300000; // every 5 minutes
 const READY = 'I will now look for newly added apartments at Wåhlins Fastigheter. Beep Boop.';
 
 const main = () => {
@@ -19,7 +19,8 @@ const main = () => {
 
         sendMessage(READY);
     } catch (error) {
-        sendMessage(`Error in main: ${error}`);
+        sendMessage('error in main');
+        sendMessage(error);
         clearInterval(interval);
     }
 };
@@ -35,7 +36,7 @@ const mainOnce = () => {
 }
 
 const onMessage = (discordMessage) => {
-    console.log(`Receieved message: ${discordMessage.content}`);
+    console.log(`receieved message: ${discordMessage.content}`);
 
     if (discordMessage.content === '!status') {
         (async () => {
@@ -51,22 +52,40 @@ const onMessage = (discordMessage) => {
 
                 discord.sendMessage(message);
             } catch (error) {
-                discord.sendMessage(`Couldn't get apartments: ${error}`);
+                discord.sendMessage(`couldn't get apartments: ${error}`);
             }
         })();
-    } else if (discordMessage.content === '!list') {
+    } else if (discordMessage.content === '!active') {
+        (async () => {
+            try {
+                const sevenDaysAgo = new Date().getTime() - (7 * 24 * 60 * 60 * 1000);
+                const apartments = (await db
+                    .getAll())
+                    .filter((item) => new Date(item.created) > sevenDaysAgo )
+
+                const message = `
+### List of active apartments applied (${apartments.length}) ###
+${apartments.map(apartment => [apartment.address, apartment.area, apartment.rent]).sort().join('\n')}
+`;
+
+                discord.sendMessage(message);
+            } catch (error) {
+                discord.sendMessage(`couldn't get apartments: ${error}`);
+            }
+        })();
+    } else if (discordMessage === '!list') {
         (async () => {
             try {
                 const apartments = await db.getAll();
 
                 const message = `
-### List of apartments applied ###
-${apartments.map(apartment => apartment.address).sort().join('\n')}
+### List of all apartments applied (${apartments.length}) ###
+${apartments.map(apartment => [apartment.address, apartment.area, apartment.rent]).sort().join('\n')}
 `;
 
                 discord.sendMessage(message);
             } catch (error) {
-                discord.sendMessage(`Couldn't get apartments: ${error}`);
+                discord.sendMessage(`couldn't get apartments: ${error}`);
             }
         })();
     }
@@ -74,4 +93,8 @@ ${apartments.map(apartment => apartment.address).sort().join('\n')}
 
 // connect to discord server and start app
 //discord.init(onMessage, main);
+
+// start the app without discord server
+//main();
+
 mainOnce();

@@ -2,11 +2,14 @@ require('dotenv').config();
 const faunadb = require('faunadb');
 const q = faunadb.query;
 
+const { clone } = require('./util');
+
 class DB {
     constructor() {
         this.client = new faunadb.Client(
             { secret: process.env.FAUNADB_SECRET }
         );
+        this.cache = [];
     }
 
     async addApartment(object) {
@@ -34,13 +37,19 @@ class DB {
 
             console.log('added apartment to db');
             console.log(result.data);
+
+            this.cache = null;
         } catch (error) {
-            console.log(`Error when adding apartment to db: ${error}`);
+            console.log(`error when adding apartment to db: ${error}`);
             throw error;
         }
     }
 
     async getAllApartments() {
+        if (this.cache) {
+            return clone(this.cache);
+        }
+
         try {
             // get all references from index
             const refs = await this.client.query(
@@ -49,10 +58,16 @@ class DB {
 
             // get all instances from references
             const rows = refs.data.map(ref => q.Get(ref));
-            const instances = await this.client.query(rows);
-            return instances.map(instance => instance.data);
+            let instances = await this.client.query(rows);
+            instances = instances
+                .filter(instance => instance.applicant === process.env.SOCIAL_SECURITY_NUMBER)
+                .map(instance => instance.data);
+
+            // add result to cache
+            this.cache = instances;
+            return clone(this.cache);
         } catch (error) {
-            console.log(`Error when retrieving all apartments: ${error}`);
+            console.log(`error when retrieving all apartments: ${error}`);
             throw error;
         }
     }

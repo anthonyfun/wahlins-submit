@@ -7,21 +7,6 @@ const db = require('./db.js');
 //const URL = 'https://wahlinfastigheter.se/lediga-objekt/lagenhet/';
 const URL = 'https://dizz.se/wahlins';
 
-const INPUT_IDS = [
-    'Förnamn',
-    'Efternamn',
-    'Gatuadress',
-    'Postort',
-    'Postkod',
-    'Typ_av_boende',
-    'Personnummer',
-    'E-post',
-    'Telefon',
-    'Mobil',
-    'Arbetsgivare',
-    'Årsinkomst',
-];
-
 const formLut = [];
 formLut['Förnamn'] = process.env.FIRST_NAME;
 formLut['Efternamn'] = process.env.LAST_NAME;
@@ -35,13 +20,6 @@ formLut['Telefon'] = process.env.PHONE;
 formLut['Mobil'] = process.env.PHONE;
 formLut['Arbetsgivare'] = process.env.EMPLOYER;
 formLut['Årsinkomst'] = process.env.SALARY;
-
-const CONTACT_LABEL = 'Kontaktperson';
-const SELECT_TOTAL_RESIDENTS_ID = 'Hushållet_personer';
-const TEXTAREA_OTHER_NAME = 'message';
-const CHECKBOX_GDPR_ID = 'gdpr_checkbox';
-const OTHER_FIELD_SPECIAL_CASE = 'Jag förstår att visningen är idag!';
-const NO_NEW_APARTMENTS = 'Just nu har vi tyvärr inga lediga lägenheter att förmedla här.';
 
 class Robot {
     constructor() {
@@ -66,6 +44,7 @@ class Robot {
 
             console.log('opening new page');
             const page = await browser.newPage();
+            page.setDefaultTimeout(10000);
 
             console.log(`switching url to ${URL}`);
             await page.goto(URL);
@@ -76,7 +55,7 @@ class Robot {
             console.log('closing browser');
             await browser.close();
         } catch (error) {
-            sendMessage(`Error: ${error}`);
+            sendMessage(`error: ${error}`);
             throw error;
         }
 
@@ -97,8 +76,8 @@ class Robot {
             return hrefs;
         });
 
-        const existingObjectNumbers = await db
-            .getAllApartments()
+        const existingObjectNumbers = (await db
+            .getAllApartments())
             .map((item) => item.objectNumber);
 
         for (let href of hrefs) {
@@ -113,32 +92,33 @@ class Robot {
                 continue;
             }
 
-            if (await this.applyForApartment(page)) {
-                sendMessage(`applied for apartment! 
-                    ${[information['Om'], information['Area'], information['Hyra']].join(', ')}`
-                );
+            const importantNotice = information['Viktigt om visning'];
+            const fillOtherField = importantNotice && importantNotice.includes('övrigtfältet');
 
-                try {
-                    console.log('saving apartment to db');
-                    await db.addApartment({
-                        href,
-                        objectNumber: information['Objektsnummer'],
-                        address: information['Om'],
-                        rooms: information['Rum'],
-                        area: information['Area'],
-                        rent: information['Hyra'],
-                        moveIn: information['Inflytt'],
-                        type: information['Typ'],
-                        salaryRequirement: information['Inkomstkrav'],
-                        lottery: information['Lottning'],
-                        importantNotice: information['Viktigt om visning']
-                    });
-                } catch (error) {
-                    sendMessage(`Couldn't save apartment to db: ${error}`);
-                }
-            } else {
-                sendMessage(`Couldn't apply for apartment ${information}`);
-                throw 'Error, couldn\'t apply for apartment';
+            //await this.applyForApartment(page, fillOtherField);
+            sendMessage(`applied for apartment! ${[information['Om'], information['Area'], information['Hyra']].join(', ')}`);
+
+            if (importantNotice) {
+                sendMessage(importantNotice);
+            }
+
+            try {
+                console.log('saving apartment to db');
+                await db.addApartment({
+                    href,
+                    objectNumber: information['Objektsnummer'],
+                    address: information['Om'],
+                    rooms: information['Rum'],
+                    area: information['Area'],
+                    rent: information['Hyra'],
+                    moveIn: information['Inflytt'],
+                    type: information['Typ'],
+                    salaryRequirement: information['Inkomstkrav'],
+                    lottery: information['Lottning'],
+                    importantNotice: information['Viktigt om visning']
+                });
+            } catch (error) {
+                sendMessage(`couldn't save apartment to db: ${error}`);
             }
         }
     }
@@ -171,71 +151,44 @@ class Robot {
         });
     }
 
-    async applyForApartment(page) {
-        await this.fillForm(page);
+    async applyForApartment(page, fillOtherField) {
+        await this.fillForm(page, fillOtherField);
         await this.submitForm(page);
-        await page.waitFor(10000);
-        return await this.confirmApplication(page);
-    }
-
-    async getContact(page) {
-        return await page.evaluate(() => {
-            const elements = document.getElementsByTagName('h3');
-            for (let element of elements) {
-                if (element.innerText === CONTACT_LABEL) {
-                    if (element.parentElement) {
-                        const contact = element.parentElement.innerText.replace(/"(.*?)"/g);
-                        console.log(contact);
-                        return contact;
-                    }
-                }
-            }
-
-            console.log('didn\'t find contact');
-            return '';
-        });
+        await this.confirmApplication(page);
     }
 
     async fillForm(page, fillOtherField) {
-        console.log("filling form");
-        for (let i = 0; i < INPUT_IDS.length; ++i) {
-            const id = INPUT_IDS[i];
-            console.log(`waiting and typing for #${id}`)
-            await page.waitFor(`#${id}`);
-            await page.type(`#${id}`, formLut[id]);
+        const keys = Object.keys(formLut);
+        console.log(`waiting and typing for all fields`);
+        for (let key of keys) {
+            await page.waitFor(`#${key}`);
+            await page.type(`#${key}`, formLut[key]);
         }
 
         if (fillOtherField) {
             // special case, the apartment viewing is today so we gotta let them know in the
             // 'other' field that we understand it. 
-            await page.waitFor(`#${TEXTAREA_OTHER_NAME}`);
-            await page.type(`#${TEXTAREA_OTHER_NAME}`, OTHER_FIELD_SPECIAL_CASE);
+            const otherId = '#message';
+
+            await page.waitFor(otherId);
+            await page.type(otherId, 'Jag har tagit del av den viktiga informationen!');
         }
 
-        await page.select(`#${SELECT_TOTAL_RESIDENTS_ID}`, '1');
-        await page.click(`#${CHECKBOX_GDPR_ID}`);
+        await page.select('#Hushållet_personer', '1');
+        await page.click('#gdpr_checkbox');
     }
 
     async submitForm(page) {
-        return await page.evaluate(() => {
+        console.log("will now click submit button");
+        await page.evaluate(() => {
             let input = document.querySelector('input[name="Submit"]');
-            if (input) {
-                input.click();
-                return true;
-            }
-            return false;
+            input.click();
         });
     }
 
     async confirmApplication(page) {
-        await page.waitForSelector('.submit-green');
-        console.log(page.url());
-        let temp = await page.evaluate(() => {
-            const element = document.querySelector('.submit-green');
-            return element && element.innerText.includes('Tack!');
-        });
-        page.waitFor(10000);
-        return temp;
+        const selector = 'submit-green';
+        await page.waitForSelector(selector);
     }
 
     getRequestCount() {

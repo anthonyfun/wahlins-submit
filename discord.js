@@ -18,18 +18,18 @@ class DiscordClient {
     init(onMessage, onReady) {
         this.client.on('ready', () => {
             this.status = Status.RUNNING;
-            this.sendMessage('Client connected');
+            this.sendMessage('client connected');
             onReady();
         });
         
         this.client.on('error', (error) => {
             this.status = Status.ERROR;
-            this.sendMessage(`Client error ${error}`);
+            this.sendMessage(`client error ${error}`);
         });
         
         this.client.on('disconnect', () => {
             this.status = Status.NOT_CONNECTED;
-            this.sendMessage('Client disconnected');
+            this.sendMessage('client disconnected');
         });
         
         this.client.on('message', onMessage);
@@ -44,7 +44,7 @@ class DiscordClient {
 
         const channel = this.client.channels.find(c => c.id === Disc.CHANNEL_ID);
         if (! channel) {
-            console.log(`Couldn't find channel with id ${CHANNEL_ID}`);
+            console.log(`couldn't find channel with id ${CHANNEL_ID}`);
             return;
         }
 

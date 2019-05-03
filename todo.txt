@@ -1,4 +1,4 @@
-( ) Automatiskt fyll i nyupplagda lägenheter på wåhlins fastigheter's webb
+(X) Automatiskt fyll i nyupplagda lägenheter på wåhlins fastigheter's webb
 (X) Lägg till databaskoppling
 (X) Spara lägenheter du ansökt i en db
 (X) Lägg till kommando för att hämta poster från db:n 
@@ -12,3 +12,5 @@
 ( ) kör puppeteer-core så man inte drar ner chromium
 ( ) få till så när du hämtar ansökningar så matchar du på 'applicant'
 ( ) kod cleanup
+( ) test för db läs/skriv
+( ) test för discord kommandon
