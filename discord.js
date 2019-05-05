@@ -27,8 +27,8 @@ class DiscordClient {
         });
         
         this.client.on('disconnect', () => {
-            this.status = Status.NOT_CONNECTED;
             this.sendMessage('client disconnected');
+            this.status = Status.NOT_CONNECTED;
         });
         
         this.client.on('message', onMessage);
