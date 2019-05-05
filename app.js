@@ -11,20 +11,22 @@ const robot = new Robot();
 
 const main = (db) => {
     let interval;
-    try {
-        interval = setInterval(
-            async () => {
+    interval = setInterval(
+        async () => {
+            try {
                 await robot.run(db);
-            }, 
-            300000 // every 5 minutes
-        );
-
-        sendMessage('I will now look for newly added apartments at Wåhlins Fastigheter. Beep Boop.');
-    } catch (error) {
-        sendMessage('error in main');
-        sendMessage(error);
-        clearInterval(interval);
-    }
+            } catch (error) {
+                if (typeof error === 'string') {
+                    sendMessage(error);
+                } else {
+                    sendMessage(`error in main, ${error.message}, ${error.stack}`);
+                }
+                clearInterval(interval);
+            }
+        }, 
+        300000 // every 5 minutes
+    );
+    sendMessage('I will now look for newly added apartments at Wåhlins Fastigheter. Beep Boop.');
 };
 
 console.log(`running app in ${process.env.NODE_ENV}`);
