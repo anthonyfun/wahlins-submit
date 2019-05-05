@@ -12,7 +12,7 @@ beforeAll(async () => {
 });
 
 test('should run without throwing exception', async () => {
-    jest.setTimeout(30000);
+    jest.setTimeout(60000);
 
     await robot.run(db);
 
