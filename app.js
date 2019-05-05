@@ -30,7 +30,7 @@ const main = (db) => {
 console.log(`running app in ${process.env.NODE_ENV}`);
 
 // connect to discord server and start app
-discord.init(setupCommandsForDiscord(command, robot, db, discord), main);
+discord.init(setupCommandsForDiscord(command, robot, db, discord), () => main(db));
 
 // start the app without discord server
 //main(db);
