@@ -16,9 +16,10 @@ test('should run without throwing exception', async () => {
 
     await robot.run(db);
 
-    const list = await db.getAllApartments();
+    let list = await db.getAllApartments();
     expect(list.length).toBe(3);
 
     await db.deleteAllApartments();
+    list = await db.getAllApartments();
     expect(list.length).toBe(0);
 });
