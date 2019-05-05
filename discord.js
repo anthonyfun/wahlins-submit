@@ -1,7 +1,6 @@
-require('dotenv').config();
+require('custom-env').env(true)
 const Discord = require('discord.js');
 
-const CHANNEL_ID = '385206081594327042';
 const Status = {
     NOT_CONNECTED: 'Not connected',
     RUNNING: 'Running',
@@ -42,7 +41,7 @@ class DiscordClient {
             return;
         }
 
-        const channel = this.client.channels.find(c => c.id === Disc.CHANNEL_ID);
+        const channel = this.client.channels.find(c => c.id === '385206081594327042');
         if (! channel) {
             console.log(`couldn't find channel with id ${CHANNEL_ID}`);
             return;

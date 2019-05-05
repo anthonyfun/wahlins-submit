@@ -1,11 +1,8 @@
+require('custom-env').env(true);
 const puppeteer = require('puppeteer');
 const isPi = require('detect-rpi');
 
-const { sendMessage } = require('./util.js');
-const db = require('./db.js');
-
-//const URL = 'https://wahlinfastigheter.se/lediga-objekt/lagenhet/';
-const URL = 'https://dizz.se/wahlins';
+const { sendMessage } = require('./util');
 
 const formLut = [];
 formLut['Förnamn'] = process.env.FIRST_NAME;
@@ -26,10 +23,8 @@ class Robot {
         this.requestCount = 0;
     }
 
-    async run() {
+    async run(db) {
         try {
-            console.log('running');
-
             // 'chromium-browser' is needed for Raspian on raspberry pi, 
             // couldn't make it work otherwise.
             const options = isPi() 
@@ -46,11 +41,11 @@ class Robot {
             const page = await browser.newPage();
             page.setDefaultTimeout(10000);
 
-            console.log(`switching url to ${URL}`);
-            await page.goto(URL);
+            console.log(`switching url to ${process.env.TARGET_URL}`);
+            await page.goto(process.env.TARGET_URL);
 
             console.log('will now look for new apartments');
-            await this.applyForApartments(page);
+            await this.applyForApartments(page, db);
         
             console.log('closing browser');
             await browser.close();
@@ -62,7 +57,7 @@ class Robot {
         ++this.requestCount;
     }
 
-    async applyForApartments(page) {
+    async applyForApartments(page, db) {
         console.log('will now try fetch hrefs for new apartments');
         const hrefs = await page.evaluate(() => {
             let hrefs = [];
@@ -95,7 +90,7 @@ class Robot {
             const importantNotice = information['Viktigt om visning'];
             const fillOtherField = importantNotice && importantNotice.includes('övrigtfältet');
 
-            //await this.applyForApartment(page, fillOtherField);
+            await this.applyForApartment(page, fillOtherField);
             sendMessage(`applied for apartment! ${[information['Om'], information['Area'], information['Hyra']].join(', ')}`);
 
             if (importantNotice) {
@@ -153,8 +148,12 @@ class Robot {
 
     async applyForApartment(page, fillOtherField) {
         await this.fillForm(page, fillOtherField);
-        await this.submitForm(page);
-        await this.confirmApplication(page);
+        
+        // only submit form in production because reasons
+        if (process.env.NODE_ENV === 'prod') {
+            await this.submitForm(page);
+            await this.confirmApplication(page);
+        }
     }
 
     async fillForm(page, fillOtherField) {
@@ -196,5 +195,4 @@ class Robot {
     }
 }
 
-const robot = new Robot();
-module.exports = robot;
+module.exports = Robot;

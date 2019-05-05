@@ -1,4 +1,4 @@
-discord = require('./discord.js');
+discord = require('./discord');
 
 const sendMessage = (message) => {
     console.log(message);

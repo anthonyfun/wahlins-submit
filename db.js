@@ -1,15 +1,17 @@
-require('dotenv').config();
+require('custom-env').env(true);
 const faunadb = require('faunadb');
 const q = faunadb.query;
 
-const { clone } = require('./util');
+const Storage = require('./storage');
+
+const storageApartmentsKey = 'apartments';
 
 class DB {
     constructor() {
         this.client = new faunadb.Client(
             { secret: process.env.FAUNADB_SECRET }
         );
-        this.cache = [];
+        this.storage = new Storage();
     }
 
     async addApartment(object) {
@@ -38,7 +40,7 @@ class DB {
             console.log('added apartment to db');
             console.log(result.data);
 
-            this.cache = null;
+            this.storage.clear(storageApartmentsKey);
         } catch (error) {
             console.log(`error when adding apartment to db: ${error}`);
             throw error;
@@ -46,32 +48,49 @@ class DB {
     }
 
     async getAllApartments() {
-        if (this.cache) {
-            return clone(this.cache);
-        }
+        if (this.storage.exists(storageApartmentsKey)) {
+            return this.storage.get(storageApartmentsKey);
+        } 
 
         try {
-            // get all references from index
-            const refs = await this.client.query(
-                q.Paginate(q.Match(q.Index('all_apartments')))
-            );
+            const refs = await this.getAllReferencesFromIndex();            
+            const rows = refs.data.map(ref => q.Get(ref));
 
             // get all instances from references
-            const rows = refs.data.map(ref => q.Get(ref));
             let instances = await this.client.query(rows);
             instances = instances
-                .filter(instance => instance.applicant === process.env.SOCIAL_SECURITY_NUMBER)
+                .filter(instance => instance.data.applicant === process.env.SOCIAL_SECURITY_NUMBER)
                 .map(instance => instance.data);
 
-            // add result to cache
-            this.cache = instances;
-            return clone(this.cache);
+            // add result to storage
+            this.storage.set(storageApartmentsKey, instances);
+            return instances;
         } catch (error) {
             console.log(`error when retrieving all apartments: ${error}`);
             throw error;
         }
     }
+
+    async deleteAllApartments() {
+        try {
+            this.storage.clear(storageApartmentsKey);
+
+            const refs = await this.getAllReferencesFromIndex();
+            const rows = refs.data.map(ref => q.Delete(ref));
+
+            // delete all instances from references
+            await this.client.query(rows);
+        } catch (error) {
+            console.log(`error when deleting all apartments ${error}`);
+            throw error;
+        }
+    }
+
+    async getAllReferencesFromIndex() {
+        return await this.client.query(
+            q.Paginate(q.Match(q.Index('all_apartments')))
+        );
+    }
 }
 
-const db = new DB();
-module.exports = db;
+module.exports = DB;
