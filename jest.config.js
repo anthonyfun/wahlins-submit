@@ -1,1 +1,1 @@
-require('custom-env').env(true);
+require('custom-env').env('stage');

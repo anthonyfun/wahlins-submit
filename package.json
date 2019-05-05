@@ -4,7 +4,7 @@
   "description": "Automatic form submission for newly added apartments at Wåhlins Fastigheter",
   "main": "app.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=stage jest --config jest.config.js",
+    "test": "jest --config jest.config.js",
     "start": "cross-env NODE_ENV=stage node app.js",
     "prod": "cross-env NODE_ENV=prod node app.js"
   },
