@@ -15,7 +15,6 @@ const main = (db) => {
         interval = setInterval(
             async () => {
                 await robot.run(db);
-                ++requestCount;
             }, 
             300000 // every 5 minutes
         );
