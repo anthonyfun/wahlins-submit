@@ -18,4 +18,7 @@ test('should run without throwing exception', async () => {
 
     const list = await db.getAllApartments();
     expect(list.length).toBe(3);
+
+    await db.deleteAllApartments();
+    expect(list.length).toBe(0);
 });

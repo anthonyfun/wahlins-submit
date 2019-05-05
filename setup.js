@@ -1,8 +1,8 @@
-const setupCommandsForDiscord = (command, db, discord) => {
+const setupCommandsForDiscord = (command, robot, db, discord) => {
     command.set('!status', () => {
         (async () => {
             try {
-                const apartments = await db.getAll();
+                const apartments = await db.getAllApartments();
 
                 const message = `
     ### Status ###
@@ -11,9 +11,9 @@ const setupCommandsForDiscord = (command, db, discord) => {
     * Applied count: ${apartments.length}
     `;
 
-                sendMessage(message);
+                discord.sendMessage(message);
             } catch (error) {
-                sendMessage(`couldn't get apartments: ${error}`);
+                discord.sendMessage(`couldn't get apartments: ${error}`);
             }
         })();
     });
@@ -23,7 +23,7 @@ const setupCommandsForDiscord = (command, db, discord) => {
             try {
                 const sevenDaysAgo = new Date().getTime() - (7 * 24 * 60 * 60 * 1000);
                 const apartments = (await db
-                    .getAll())
+                    .getAllApartments())
                     .filter((item) => new Date(item.created) > sevenDaysAgo )
 
                 const message = `
@@ -41,7 +41,7 @@ const setupCommandsForDiscord = (command, db, discord) => {
     command.set('!list', () => {
         (async () => {
             try {
-                const apartments = await db.getAll();
+                const apartments = await db.getAllApartments();
 
                 const message = `
     ### List of all apartments applied (${apartments.length}) ###
