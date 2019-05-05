@@ -8,9 +8,9 @@
 (X) kan fylla i formulär
 ( ) få till automatisk release vid push till master på din pi
 ( ) få till automatisk omstart av app vid error/restart på din pi
-( ) setInterval(async () => ...) - få till så att den inte kör igen om den inte är klar
 ( ) kör puppeteer-core så man inte drar ner chromium
-( ) få till så när du hämtar ansökningar så matchar du på 'applicant'
+(X) få till så när du hämtar ansökningar så matchar du på 'applicant'
 ( ) kod cleanup
-( ) test för db läs/skriv
-( ) test för discord kommandon
+(X) test för db läs/skriv
+(X) test för discord kommandon
+(X) test för robot
