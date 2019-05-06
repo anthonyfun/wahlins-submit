@@ -42,7 +42,12 @@ class Robot {
             page.setDefaultTimeout(10000);
 
             console.log(`switching url to ${process.env.TARGET_URL}`);
-            await page.goto(process.env.TARGET_URL);
+            try {
+                await page.goto(process.env.TARGET_URL);
+            } catch (error) {
+                // wåhlins fastigheter might be down, just return
+                return;
+            }
 
             console.log('will now look for new apartments');
             await this.applyForApartments(page, db);
