@@ -28,7 +28,7 @@ const setupCommandsForDiscord = (command, robot, db, discord) => {
 
                 const message = `
     ### List of active apartments applied (${apartments.length}) ###
-    ${apartments.map(apartment => [apartment.address, apartment.area, apartment.rent]).sort().join('\n')}
+    ${apartments.map(apartment => [apartment.address, apartment.area, apartment.rent].join(', ')).sort().join('\n')}
     `;
 
                 discord.sendMessage(message);
@@ -45,7 +45,7 @@ const setupCommandsForDiscord = (command, robot, db, discord) => {
 
                 const message = `
     ### List of all apartments applied (${apartments.length}) ###
-    ${apartments.map(apartment => [apartment.address, apartment.area, apartment.rent]).sort().join('\n')}
+    ${apartments.map(apartment => [apartment.address, apartment.area, apartment.rent].join(', ')).sort().join('\n')}
     `;
 
                 discord.sendMessage(message);
