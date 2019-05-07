@@ -191,7 +191,7 @@ class Robot {
     }
 
     async confirmApplication(page) {
-        const selector = 'submit-green';
+        const selector = '.submit-green';
         await page.waitForSelector(selector);
     }
 
