@@ -14,3 +14,4 @@
 (X) test för db läs/skriv
 (X) test för discord kommandon
 (X) test för robot
+(X) se till så att den inte kraschar vid timeout i goto

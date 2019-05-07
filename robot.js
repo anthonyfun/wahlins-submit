@@ -45,7 +45,7 @@ class Robot {
             try {
                 await page.goto(process.env.TARGET_URL);
             } catch (error) {
-                // wåhlins fastigheter might be down, just return
+                console.log(`no response from ${process.env.TARGET_URL}`);
                 return;
             }
 
@@ -82,7 +82,13 @@ class Robot {
 
         for (let href of hrefs) {
             console.log(`switching url to ${href}`);
-            await page.goto(href);
+            try {
+                await page.goto(href);
+            } catch (error) {
+                console.log(`no response from ${href}`);
+                // wåhlins fastigheter might be down, just return
+                return;
+            }
 
             console.log('fetching information');
             const information = await this.getInformation(page);
@@ -105,7 +111,6 @@ class Robot {
             try {
                 console.log('saving apartment to db');
                 await db.addApartment({
-                    href,
                     objectNumber: information['Objektsnummer'],
                     address: information['Om'],
                     rooms: information['Rum'],
