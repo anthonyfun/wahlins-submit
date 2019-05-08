@@ -17,7 +17,6 @@ class DB {
     async addApartment(object) {
         const apartment = {
             applicant: process.env.SOCIAL_SECURITY_NUMBER,
-            href: object.href,
             objectNumber: object.objectNumber,
             address: object.address,
             rooms: object.rooms,
