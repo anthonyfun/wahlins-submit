@@ -1,4 +1,4 @@
-const { clone } = require('../util');
+const { clone } = require('../src/util');
 
 test('should be equal', () => {
     const test = {

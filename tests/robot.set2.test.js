@@ -1,5 +1,5 @@
-const Robot = require('../robot');
-const DB = require('../db');
+const Robot = require('../src/robot');
+const DB = require('../src/db');
 
 let db;
 let robot;

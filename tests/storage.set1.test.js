@@ -1,4 +1,4 @@
-const Storage = require('../storage');
+const Storage = require('../src/storage');
 
 let storage;
 
