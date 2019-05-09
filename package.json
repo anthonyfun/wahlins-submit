@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "jest --config jest.config.js .set1.test && jest --config jest.config.js .set2.test",
-    "start": "cross-env NODE_ENV=stage node app.js",
-    "prod": "cross-env NODE_ENV=prod node app.js"
+    "start": "cross-env NODE_ENV=stage node src/app.js",
+    "prod": "cross-env NODE_ENV=prod node src/app.js"
   },
   "repository": {
     "type": "git",

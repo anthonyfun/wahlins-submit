@@ -24,7 +24,7 @@ const main = (db) => {
                 clearInterval(interval);
             }
         }, 
-        300000 // every 5 minutes
+        300000  // every 5 minutes
     );
     sendMessage('I will now look for newly added apartments at Wåhlins Fastigheter. Beep Boop.');
 };
@@ -32,7 +32,7 @@ const main = (db) => {
 console.log(`running app in ${process.env.NODE_ENV}`);
 
 // connect to discord server and start app
-discord.init(setupCommandsForDiscord(command, robot, db, discord), () => main(db));
+//discord.init(setupCommandsForDiscord(command, robot, db, discord), () => main(db));
 
 // start the app without discord server
-//main(db);
+main(db);

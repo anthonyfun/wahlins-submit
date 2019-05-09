@@ -10,7 +10,7 @@
 ( ) få till automatisk omstart av app vid error/restart på din pi
 ( ) kör puppeteer-core så man inte drar ner chromium
 (X) få till så när du hämtar ansökningar så matchar du på 'applicant'
-( ) kod cleanup
+(X) kod cleanup
 (X) test för db läs/skriv
 (X) test för discord kommandon
 (X) test för robot
