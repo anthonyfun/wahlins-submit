@@ -119,6 +119,7 @@ class Robot {
                     moveIn: information['Inflytt'],
                     type: information['Typ'],
                     salaryRequirement: information['Inkomstkrav'],
+                    header: information.header,
                     lottery: information['Lottning'],
                     importantNotice: information['Viktigt om visning']
                 });
@@ -151,6 +152,9 @@ class Robot {
                     }
                 }
             }
+
+            const purpleBgs = document.querySelectorAll('.purple-bg');
+            information.header = purpleBgs[1].innerText;
 
             return information;
         });

@@ -26,6 +26,7 @@ class DB {
             type: object.type,
             salaryRequirement: object.salaryRequirement,
             importantNotice: object.importantNotice,
+            header: object.header,
             lottery: object.lottery,
             created: new Date().toUTCString()
         };
