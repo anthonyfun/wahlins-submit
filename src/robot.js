@@ -2,7 +2,7 @@ require('custom-env').env(true);
 const puppeteer = require('puppeteer');
 const isPi = require('detect-rpi');
 
-const { sendMessage } = require('./util');
+const { sendMessage, formatAddress } = require('./util');
 
 const formLut = [];
 formLut['Förnamn'] = process.env.FIRST_NAME;
@@ -101,8 +101,9 @@ class Robot {
             const importantNotice = information['Viktigt om visning'];
             const fillOtherField = importantNotice && importantNotice.includes('övrigtfältet');
 
+            const address = formatAddress(information['Om'], information.header);
             await this.applyForApartment(page, fillOtherField);
-            sendMessage(`applied for apartment! ${[information['Om'], information['Area'], information['Hyra']].join(', ')}`);
+            sendMessage(`applied for apartment! ${[address, information['Area'], information['Hyra']].join(', ')}`);
 
             if (importantNotice) {
                 sendMessage(importantNotice);
@@ -112,7 +113,7 @@ class Robot {
                 console.log('saving apartment to db');
                 await db.addApartment({
                     objectNumber: information['Objektsnummer'],
-                    address: information['Om'],
+                    address,
                     rooms: information['Rum'],
                     area: information['Area'],
                     rent: information['Hyra'],
