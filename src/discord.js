@@ -23,7 +23,7 @@ class DiscordClient {
         
         this.client.on('error', (error) => {
             this.status = Status.ERROR;
-            this.sendMessage(`client error ${error}`);
+            this.sendMessage(`client error ${error.message}`);
         });
         
         this.client.on('disconnect', () => {
