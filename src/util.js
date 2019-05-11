@@ -32,6 +32,8 @@ const removeCommonOccurences = (str) => {
     }
 
     str = str 
+        .replace('Centrala')
+        .replace('centrala')
         .replace('.', '')
         .replace(' i ', ', ')
         .replace(' på ', '')
