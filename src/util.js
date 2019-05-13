@@ -21,7 +21,15 @@ const formatAddress = (about, header) => {
     about = removeCommonOccurences(about);
     header = removeCommonOccurences(header);
 
-    return about.length < 8 
+    const cities = [
+        'sundbyberg',
+        'stockholm',
+        'johanneshov',
+        'huvudsta',
+        'bagarmossen'
+    ];
+
+    return about.length < 7 || cities.indexOf(about.toLowerCase()) >= 0
         ? header 
         : about;
 }
@@ -32,8 +40,16 @@ const removeCommonOccurences = (str) => {
     }
 
     str = str 
-        .replace('Centrala')
-        .replace('centrala')
+        .replace('max 4 år', '')
+        .replace('max 3 år', '')
+        .replace('max 2 år', '')
+        .replace('max 1 år', '')
+        .replace('Max 4 år', '')
+        .replace('Max 3 år', '')
+        .replace('Max 2 år', '')
+        .replace('Max 1 år', '')
+        .replace('Centrala', '')
+        .replace('centrala', '')
         .replace('.', '')
         .replace(' i ', ', ')
         .replace(' på ', '')
@@ -66,6 +82,14 @@ const removeCommonOccurences = (str) => {
         .replace('Korttidskontrakt', '')
         .replace(/\s+/g, ' ');
 
+    if (str.indexOf('inflytt') === 0 || str.indexOf('Inflytt') === 0) {
+        const index = str.indexOf(',');
+        if (index >= 0 && index !== str.length - 1) {
+            str = str.substring(index + 1, str.length);
+        }
+    }
+
+    str.trim();
     if (str.length > 0) {
         if (str[0].match(/^[^A-Za-z0-9]+$/)) {
             str = str.substring(1, str.length);
@@ -74,8 +98,7 @@ const removeCommonOccurences = (str) => {
             str = str.substring(0, str.length - 2);
         }
     }
-
-    return str;
+    return str.trim();
 };
 
 module.exports = {

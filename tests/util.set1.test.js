@@ -45,4 +45,16 @@ test('should format correct addresses', () => {
 
     expect(formatAddress('1 rokvrå. Korttidskontrakt!', '324-114 | 1 rok, Järnvägsgatan 46, korttidskontrakt'))
         .toEqual('Järnvägsgatan 46');
+
+    expect(formatAddress('max 4 år, Emågatan 9, Bagarmossen', '183-223 | 1 rok, 25 kvm, Emågatan 9, Bagarmossen, KORTTIDSKONTRAKT, INFLYTT 1/6'))
+        .toEqual('Emågatan 9, Bagarmossen');
+
+    expect(formatAddress('Inflytt 1 juni 2019, Södergatan 2B, Märsta', '503-144, Södergatan 2B, Märsta | 2 rok, plan 4, 63 kvm, Södergatan 2B, Märsta (nära Arlanda), inflytt 1 juni'))
+        .toEqual('Södergatan 2B, Märsta');
+
+    expect(formatAddress('Inflytt 1 juni 2019, Mjölnarstigen 37', '209-431 | 4 rok, Mjölnarstigen 37, Spånga-Bromsten, inflytt 1/6'))
+        .toEqual('Mjölnarstigen 37');
+
+    expect(formatAddress('Centrala Sundbyberg', '322-113 | Rosengatan 1 i Sundbyberg'))
+        .toEqual('Rosengatan 1, Sundbyberg');
 });
