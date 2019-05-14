@@ -57,4 +57,7 @@ test('should format correct addresses', () => {
 
     expect(formatAddress('Centrala Sundbyberg', '322-113 | Rosengatan 1 i Sundbyberg'))
         .toEqual('Rosengatan 1, Sundbyberg');
+
+    expect(formatAddress('Centralt, Sundbyberg', '314-124 | Starrbäcksgatan 16 A, Sundbyberg')) 
+        .toEqual('Starrbäcksgatan 16 A, Sundbyberg');
 });
