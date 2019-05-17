@@ -21,6 +21,7 @@ const main = (db) => {
                 } else {
                     sendMessage(`error in main, ${error.message}, ${error.stack}`);
                 }
+                sendMessage("stopping bot");
                 clearInterval(interval);
             }
         }, 
