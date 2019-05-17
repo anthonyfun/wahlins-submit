@@ -26,10 +26,15 @@ const formatAddress = (about, header) => {
         'stockholm',
         'johanneshov',
         'huvudsta',
-        'bagarmossen'
+        'bagarmossen',
+        'ursvik',
+        'spånga',
+        'bromsten'
     ];
+    const cityIndex = cities.indexOf(about.toLowerCase());
+    const isOnlyCityName = cityIndex >= 0 && cities[cityIndex].length === about.length;
 
-    return about.length < 7 || cities.indexOf(about.toLowerCase()) >= 0
+    return about.length < 7 || isOnlyCityName
         ? header 
         : about;
 }
@@ -39,63 +44,72 @@ const removeCommonOccurences = (str) => {
         return '';
     }
 
+    const phrases = [
+        'max 4 år',
+        'max 3 år',
+        'max 2 år',
+        'max 1 år',
+        'Max 4 år',
+        'Max 3 år',
+        'Max 4 år',
+        'Max 1 år',
+        'Centralt',
+        'Centrala',
+        'Central',
+        '1 rok',
+        '2 rok',
+        '3 rok',
+        '4 rok',
+        '1 rokvrå',
+        '2 rokvrå',
+        '3 rokvrå',
+        '4 rokvrå',
+        'Korttidskontrakt',
+        'Nyproducerad',
+        'Rökfri',
+        'Fastighet',
+        'Lägenhet', 
+        'Söder ',
+        'Kungsholmen ',
+    ];
+
+    const replace = (str, phrase) => {
+        return str 
+            .replace(`${phrase}, `, '')
+            .replace(`${phrase} `, '')
+            .replace(`${phrase},`, '')
+            .replace(`${phrase}`, '');
+    };
+
+    for (let phrase of phrases) {
+        const lower = phrase.toLowerCase();
+        const upper = phrase.toUpperCase();
+        str = replace(str, upper)
+        str = replace(str, phrase)
+        str = replace(str, lower)
+    }
+
+    // special cases
     str = str 
-        .replace('max 4 år', '')
-        .replace('max 3 år', '')
-        .replace('max 2 år', '')
-        .replace('max 1 år', '')
-        .replace('Max 4 år', '')
-        .replace('Max 3 år', '')
-        .replace('Max 2 år', '')
-        .replace('Max 1 år', '')
-        .replace('Centralt,', '')
-        .replace('centralt,', '')
-        .replace('Centralt', '')
-        .replace('centralt', '') 
-        .replace('Centrala', '')
-        .replace('centrala', '')
         .replace('.', '')
         .replace(' i ', ', ')
         .replace(' på ', '')
         .replace('!', ' ')
-        .replace('1 rok, ', '')
-        .replace('2 rok, ', '')
-        .replace('3 rok, ', '')
-        .replace('1 rok ', '')
-        .replace('2 rok ', '')
-        .replace('3 rok ', '')
-        .replace('1 rok', '')
-        .replace('2 rok', '')
-        .replace('3 rok', '')
-        .replace('1 rokvrå, ', '')
-        .replace('2 rokvrå, ', '')
-        .replace('3 rokvrå, ', '')
-        .replace('1 rokvrå ', '')
-        .replace('2 rokvrå ', '')
-        .replace('3 rokvrå ', '')
-        .replace('1 rokvrå', '')
-        .replace('2 rokvrå', '')
-        .replace('3 rokvrå', '')
-        .replace('korttidskontrakt, ', '')
-        .replace('korttidskontrakt ', '')
-        .replace('korttidskontrakt,', '')
-        .replace('korttidskontrakt', '')
-        .replace('Korttidskontrakt, ', '')
-        .replace('Korttidskontrakt ', '')
-        .replace('Korttidskontrakt,', '')
-        .replace('Korttidskontrakt', '')
         .replace(/\s+/g, ' ');
 
-    if (str.indexOf('inflytt') === 0 || str.indexOf('Inflytt') === 0) {
-        const index = str.indexOf(',');
-        if (index >= 0 && index !== str.length - 1) {
-            str = str.substring(index + 1, str.length);
+    // remove strings like 'Inflytt den 3/6'
+    const inflyttIndex = str.toLowerCase().indexOf('inflytt');
+    if (inflyttIndex >= 0) {
+        const commaIndex = str.indexOf(',');
+        if (commaIndex > inflyttIndex && commaIndex !== str.length - 1) {
+            str = str.replace(str.substring(inflyttIndex, commaIndex), '');
         }
     }
 
+    // trim and remove special characters in beginning and end. 
     str.trim();
     if (str.length > 0) {
-        if (str[0].match(/^[^A-Za-z0-9]+$/)) {
+        if (str[0].match(/^[^A-Za-z]+$/)) {
             str = str.substring(1, str.length);
         }
         if (str[str.length - 1].match(/^[^A-Za-z0-9]+$/)) {

@@ -60,4 +60,10 @@ test('should format correct addresses', () => {
 
     expect(formatAddress('Centralt, Sundbyberg', '314-124 | Starrbäcksgatan 16 A, Sundbyberg')) 
         .toEqual('Starrbäcksgatan 16 A, Sundbyberg');
+
+    expect(formatAddress('Emågatan 9, Bagarmossen', '183-223 | 1 rok, 25 kvm, Emågatan 9, Bagarmossen, KORTTIDSKONTRAKT, INFLYTT 1/6')) 
+        .toEqual('Emågatan 9, Bagarmossen');
+
+    expect(formatAddress('Bondegatan 61', '142-102 | Korttidskontrakt på Söder')) 
+        .toEqual('Bondegatan 61');
 });

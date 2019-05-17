@@ -110,8 +110,7 @@ class Robot {
             }
 
             try {
-                console.log('saving apartment to db');
-                await db.addApartment({
+                const apartment = {
                     objectNumber: information['Objektsnummer'],
                     address,
                     rooms: information['Rum'],
@@ -123,7 +122,27 @@ class Robot {
                     header: information.header,
                     lottery: information['Lottning'],
                     importantNotice: information['Viktigt om visning']
-                });
+                };
+
+                delete information['Om'];
+                delete information['Objektsnummer'];
+                delete information['Rum'];
+                delete information['Area'];
+                delete information['Hyra'];
+                delete information['Inflytt'];
+                delete information['Typ'];
+                delete information['Inkomstkrav'];
+                delete information['Lottning'];
+                delete information['Viktigt om visning'];
+                delete information.header;
+
+                if (Object.keys(information).length > 0) {
+                    apartment.other = information;
+                    sendMessage(`Found other info ${JSON.stringify(apartment.other)}`);
+                }
+
+                console.log('saving apartment to db');
+                await db.addApartment(apartment);
             } catch (error) {
                 sendMessage(`couldn't save apartment to db: ${error}`);
             }
@@ -146,9 +165,14 @@ class Robot {
                     let key = '';
                     for (child of parent.children) {
                         if (child.classList.contains('left')) {
-                            key = child.innerText;
+                            if (child) {
+                                key = child.innerText;
+                                information[key] = null;
+                            }
                         } else if (child.classList.contains('right') && key !== '') {
-                            information[key] = child.innerText;
+                            if (child != null) {
+                                information[key] = child.innerText;
+                            }
                         }
                     }
                 }
