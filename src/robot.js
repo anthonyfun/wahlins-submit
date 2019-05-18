@@ -1,5 +1,5 @@
 require('custom-env').env(true);
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 const isPi = require('detect-rpi');
 
 const { sendMessage, formatAddress } = require('./util');
