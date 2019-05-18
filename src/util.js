@@ -93,8 +93,8 @@ const removeCommonOccurences = (str) => {
     str = str 
         .replace('.', '')
         .replace(' i ', ', ')
-        .replace(' på ', '')
-        .replace('!', ' ')
+        .replace(' på ', ' ')
+        .replace('!', '')
         .replace(/\s+/g, ' ');
 
     // remove strings like 'Inflytt den 3/6'
